@@ -9,19 +9,23 @@ AlphaRank creates a meta-game of players and uses all of the head-to-head counts
 
 
 # How to interpret the results
-Imagine that you are having a competition with another person, and you each get to choose one smash pro as your champion. Let's say you play this game over and over. How would you decide who to pick? You could always choose the player with the highest overall head-to-head winrate (Leffen). However, if your opponent picked Mango, you would lose, because Mango wins that head-to-head in 2022. Therefore, there's a meta-game of choosing strong players, but also varying your choice enough to avoid being predictable. Clearly some players are stronger (IBDW wins more head-to-heads than Axe), but each player can win some matchups. The value in parentheses represents the percent of time that a particular player would be selected in the optimal strategy for this game. The players are ranked in order of who has the highest value, in essence, who is picked the most often in this imaginary meta-game.
+Imagine that you are having a competition with another person, and you each get to choose one smash pro as your champion. Let's say you play this game over and over. How would you decide who to pick? You could always choose the player with the highest overall head-to-head winrate (Leffen). However, if your opponent picked Mango, you would lose, because Mango wins that head-to-head in 2022. Therefore, there's a meta-game of choosing strong players, but also varying your choice enough to avoid being predictable. Clearly some players are stronger (IBDW wins more head-to-heads than Axe), but each player can win some matchups. 
+The value in parentheses in the rankings below represents the percent of time that a particular player would be selected by the optimal strategy for this game. The players are ranked in order of who has the highest value, in essence, who is picked the most often in this imaginary meta-game.
+
+**TL;DR** If you could choose one pro to fight for you, AlphaRank measures how often you should pick each player. This is based on their head-to-head winrates weighted according to the strength of the opponent for each head-to-head.
 
 
 # RESULTS: 2022 Ranking (so far)
 1. Amsa (0.234)
 2. IBDW (0.200)
-3. Mango (0.131)
-4. Leffen (0.106)
-5. Plup (0.085)
-6. Jmook (0.062)
-7. Hbox (0.015)
-8. Wizzrobe (0.008)
-9. Axe (0.001)
+3. Zain (0.150)
+4. Mango (0.131)
+5. Leffen (0.106)
+6. Plup (0.085)
+7. Jmook (0.062)
+8. Hbox (0.015)
+9. Wizzrobe (0.008)
+10. Axe (0.001)
 
 # Data collection
 Thanks to ASAP_Hari on twitch for collecting most of the data that I used. The winrates used in this project come from liquipedia. I used data from offline-only supermajor, major, and invitational tournaments held Jan 1 - November 21, 2022 (including Apex 2022).
