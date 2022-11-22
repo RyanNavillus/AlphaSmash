@@ -2,6 +2,7 @@ import numpy as np
 from open_spiel.python.egt import alpharank
 from open_spiel.python.egt import utils
 from open_spiel.python.egt import heuristic_payoff_table
+from preprocess import parse_csv, parse_player_names
 
 
 # Matrix game of 2022 smash results
@@ -25,9 +26,12 @@ matrix_list = [
 ]
 
 matrix_list = np.asarray(matrix_list)
+matrix_list = parse_csv()
+
+
 payoff_tables = [heuristic_payoff_table.from_matrix_game(matrix_list)]
 
-res = alpharank.sweep_pi_vs_alpha(payoff_tables, visualize=True, return_alpha=True, strat_labels=["Mang0", "Zain", "IBDW", "Amsa", "Hungrybox", "Jmook", "Leffen", "Axe", "Plup", "Wizzrobe"])
+res = alpharank.sweep_pi_vs_alpha(payoff_tables, visualize=False, return_alpha=True, strat_labels=parse_player_names(), legend_sort_clusters=True)
 
 payoffs_are_hpt_format = utils.check_payoffs_are_hpt(payoff_tables)
 
@@ -42,4 +46,9 @@ _, payoff_tables = utils.is_symmetric_matrix_game(payoff_tables)
     payoff_tables, alpha=90)
 
 # Report results
-alpharank.print_results(payoff_tables, payoffs_are_hpt_format, pi=pi)
+# alpharank.print_results(payoff_tables, payoffs_are_hpt_format, pi=pi)
+
+rankings = reversed(sorted(zip(pi, parse_player_names())))
+for i, (score, player) in enumerate(rankings):
+    adjust = "\t" if len(player) < 11 else ""
+    print(f"{i+1}. {player} \t{adjust}({score:.4f})")
