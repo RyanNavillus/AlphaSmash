@@ -1,54 +1,52 @@
+import argparse
 import numpy as np
 from open_spiel.python.egt import alpharank
 from open_spiel.python.egt import utils
 from open_spiel.python.egt import heuristic_payoff_table
+from open_spiel.python.egt import alpharank_visualizer
 from preprocess import parse_csv, parse_player_names
 
 
-# Matrix game of 2022 smash results
-# Columns/Row Headers are Mang0, Zain, IBDW, Amsa, Hungrybox, Jmook, Leffen, Axe, Plup, Wizzrobe
-# i.e Row 4 Column 2 is Amsa vs. Zain
-# Each value represents the winrate that row player has against column player, normalized to [-1, 1]
-# Formula (s_r - s_c) / (s_r + s_c) where s_r and s_c are the set wins for the row and column players respectively
-# i.e. 0.00 represents a 50% winrate, 1.00 represents a 100% winrate, -1.00 represents a -100% winrate
-# Note: This does not account for absolute number of wins. i.e. 1-2, 2-4, and 4-8 all have the value -0.33
-matrix_list = [
-    [0.00, -0.20, 0.67, -0.50, 0.00, -0.33, 1.00, 1.00, 1.00, 0.00],
-    [0.20, 0.00, 0.00, -0.33, 0.60, 0.00, 0.00, 0.20, 0.00, -1.00],
-    [-0.67, 0.00, 0.00, 0.33, 0.50, 0.60, -1.00, 1.00, 1.00, -1.00],
-    [0.50, 0.33, -0.33, 0.00, 0.20, 0.50, 0.33, 1.00, -1.00, 0.00],
-    [0.00, -0.60, -0.50, -0.20, 0.00, 0.80, -0.33, 1.00, -0.14, -1.00],
-    [0.33, 0.00, -0.60, -0.50, -0.80, 0.00, 0.33, -0.33, 0.00, 1.00],
-    [-1.00, 0.00, 1.00, -0.33, 0.33, -0.33, 0.00, 1.00, 1.00, 1.00],
-    [-0.50, -0.20, -1.00, -1.00, -1.00, 0.33, -1.00, 0.00, 0.00, -0.33],
-    [-1.00, 0.00, -1.00, 1.00, 0.14, 0.00, -1.00, 0.00, 0.00, 1.00],
-    [0.00, -1.00, -1.00, 0.00, -1.00, -1.00, -1.00, 0.00, -1.00, 0.00],
-]
-
-matrix_list = np.asarray(matrix_list)
-matrix_list = parse_csv()
+parser = argparse.ArgumentParser()
+parser.add_argument("--alphasweep", action="store_true", help="Perform and visualize sweep over alpha parameter")
+parser.add_argument("--n_network", type=int, default=0, help="Visualize network of top players")
+parser.add_argument("--verbose", action="store_true", help="Print out extra information")
 
 
-payoff_tables = [heuristic_payoff_table.from_matrix_game(matrix_list)]
+if __name__ == "__main__":
+    args = parser.parse_args()
 
-res = alpharank.sweep_pi_vs_alpha(payoff_tables, visualize=False, return_alpha=True, strat_labels=parse_player_names(), legend_sort_clusters=True)
+    # Matrix game of 2022 smash results
+    matrix_list = parse_csv(verbose=args.verbose)
 
-payoffs_are_hpt_format = utils.check_payoffs_are_hpt(payoff_tables)
+    # Convert to Heuristic Payoff Table
+    payoff_tables = [heuristic_payoff_table.from_matrix_game(matrix_list)]
 
-# Check if the game is symmetric (i.e., players have identical strategy sets
-# and payoff tables) and return only a single-player’s payoff table if so.
-# This ensures Alpha-Rank automatically computes rankings based on the
-# single-population dynamics.
-_, payoff_tables = utils.is_symmetric_matrix_game(payoff_tables)
+    # Perform sweep of alpha hyperparameter and visualize results
+    if args.alphasweep:
+        player_names = parse_player_names()
+        res = alpharank.sweep_pi_vs_alpha(payoff_tables, visualize=True, return_alpha=True, strat_labels=player_names, legend_sort_clusters=True)
 
-# Compute Alpha-Rank
-(rhos, rho_m, pi, num_profiles, num_strats_per_population) = alpharank.compute(
-    payoff_tables, alpha=90)
+    # Check if the game is symmetric (i.e., players have identical strategy sets
+    # and payoff tables) and return only a single-player’s payoff table if so.
+    # This ensures Alpha-Rank automatically computes rankings based on the
+    # single-population dynamics.
+    payoffs_are_hpt_format = utils.check_payoffs_are_hpt(payoff_tables)
+    _, payoff_tables = utils.is_symmetric_matrix_game(payoff_tables)
 
-# Report results
-# alpharank.print_results(payoff_tables, payoffs_are_hpt_format, pi=pi)
+    # Compute Alpha-Rank
+    (rhos, rho_m, pi, num_profiles, num_strats_per_population) = alpharank.compute(payoff_tables, alpha=10)
 
-rankings = reversed(sorted(zip(pi, parse_player_names())))
-for i, (score, player) in enumerate(rankings):
-    adjust = "\t" if len(player) < 11 else ""
-    print(f"{i+1}. {player} \t{adjust}({score:.4f})")
+    # Print Alpha-Rank results
+    utils.print_rankings_table(
+        payoff_tables,
+        pi,
+        player_names,
+        num_top_strats_to_print=100)
+
+    if args.n_network > 0:
+        # Visualize transition network
+        m_network_plotter = alpharank_visualizer.NetworkPlot(payoff_tables, rhos,
+                                                             rho_m, pi, player_names,
+                                                             num_top_profiles=args.n_network)
+        m_network_plotter.compute_and_draw_network()
