@@ -41,6 +41,7 @@ The value in parentheses in the rankings below represents the percent of time th
 
 
 # RESULTS: 2022 Ranking (So Far)
+```
 Player          Rank         Score
 ------          ----         -----
 
@@ -105,7 +106,7 @@ Trif            49           0.0005
 Gahtzu          50           0.0004
 Ice             51           0.0000
 Nicki           51           0.0000
-
+```
 
 # Interesting Findings
 * Zain and IBDW are effectively tied for Rank 1. Either of them could easily edge out #1 by winning the upcoming tournaments.
