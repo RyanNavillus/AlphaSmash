@@ -153,4 +153,4 @@ This also gives you a good intuition for how Alpha-Rank works. Value flows into 
 
 
 # Testing Hypothetical Results
-You can modify data.csv and re-run AlphaSmash to test hypothetical results. For example, how would JMook be ranked if he had an even matchup against HBox? What if Mang0 wins the Smash World Tour Championshipsi, beating Amsa, Zain, and Fiction? What if Leffen never lost to Lovage in 2017?
+You can modify data.csv and re-run AlphaSmash to test hypothetical results. For example, how would JMook be ranked if he had an even matchup against HBox? What if Mang0 wins the Smash World Tour Championships, beating Amsa, Zain, and Fiction? What if Leffen never lost to Lovage in 2017?
