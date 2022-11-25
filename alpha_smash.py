@@ -23,8 +23,8 @@ if __name__ == "__main__":
     payoff_tables = [heuristic_payoff_table.from_matrix_game(matrix_list)]
 
     # Perform sweep of alpha hyperparameter and visualize results
+    player_names = parse_player_names()
     if args.alphasweep:
-        player_names = parse_player_names()
         res = alpharank.sweep_pi_vs_alpha(payoff_tables, visualize=True, return_alpha=True, strat_labels=player_names, legend_sort_clusters=True)
 
     # Check if the game is symmetric (i.e., players have identical strategy sets
