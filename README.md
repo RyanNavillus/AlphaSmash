@@ -43,6 +43,7 @@ The value in parentheses in the rankings below represents the percent of time th
 # RESULTS: 2022 Ranking (So Far)
 Player          Rank         Score
 ------          ----         -----
+
 Zain            1            0.1057
 iBDW            2            0.1055
 aMSa            3            0.0979
