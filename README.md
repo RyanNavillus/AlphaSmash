@@ -2,15 +2,16 @@
 **I am not claiming that these are the definitive ranks for this year, I am simply hoping to introduce the community to an exciting new tool that came out of game theory research recently**
 **Please do NOT use this tool for seeding without fully understanding the method or at least consulting me.**
 
-This is a simple script that uses DeepMind's [AlphaRank algorithm](https://arxiv.org/abs/1903.01373) to rank the top 10 Super Smash Bros Melee players for 2022 (so far). (Fair warning: this paper is extremely complicated, I've attempted to explain the core concepts in this README).
+This is a simple script that uses DeepMind's [Alpha-Rank algorithm](https://arxiv.org/abs/1903.01373) to rank the top 10 Super Smash Bros Melee players for 2022 (so far). (Fair warning: this paper is extremely complicated, I've attempted to explain the core concepts in this README).
 
-When you evaluate head-to-head matchups, you intuitively value certain head-to-heads more than others. An advantage over the #1 best player is obviously more important than the 50th best player. However, if you rank players using head-to-heads, this ranking becomes cyclic (with a huge branching factor equal to the number of players).
+When you evaluate head-to-head matchups, you intuitively value certain head-to-heads more than others. An advantage over the #1 best player is obviously more important than the 50th best player. However, this ranking becomes cyclic if you also decide who is 1st or 50th based on the same head-to-head heuristic (with a huge branching factor equal to the number of players).
 
-AlphaRank is a new game-theoretic evaluation metric for ranking players in a game. Game-theoretic evaluation tools use game-theory (hence the name) to measure players by taking into account *non-transitivity*. Non-transitivity refers to the possibility that player A > B and B > C and yet C > A. The simplest example of this is the game rock paper scissors, which is entirely non-transitive. 
+Alpha-Rank is a new game-theoretic evaluation metric for ranking players in a game. Game-theoretic evaluation tools use game-theory (hence the name) to measure players by taking into account *non-transitivity*. Non-transitivity refers to the possibility that player A > B and B > C and yet C > A. The simplest example of this is the game rock paper scissors, which is entirely non-transitive. 
 
-Most metrics (like those based on torunament placements) assume that games are roughly transitive. For example, they assume that if player A places higher than player B in a tournament, then player A is better than player B. This is not necessarily true, and in fact player A can lose to B and still win the tournament in a double elimination bracket. This happens every time someone wins from the losers bracket, and many other times throughout the tournament.
+Most metrics (like those based on tournament placements) assume that games are roughly transitive. For example, they assume that if player A places higher than player B in a tournament, then player A is better than player B. This is not necessarily true, and in fact player A can lose to B and still win the tournament in a double elimination bracket. This happens every time someone wins from the losers bracket, and many other times throughout every tournament.
 
-AlphaRank creates a meta-game of players and uses all of the head-to-head counts between players to determine who is the best. It measures each player's "value" according to who they can beat in a head-to-head, weighted according to their opponent's value (also calclated from head-to-heads). (i.e. beating Hugs86 gives you less value than beating Zain). Also, since AlphaRank analyzes overall winrates, it has no recency bias.
+Alpha-Rank creates a meta-game of players and uses all of the head-to-head counts between players to determine who is the best. It measures each player's "value" according to who they can beat in a head-to-head, weighted according to their opponent's value (also calculated in the same way from head-to-heads). (i.e. beating Hugs86 gives you less value than beating Zain). Also, since Alpha-Rank analyzes overall winrates, it has no recency bias.
+
 
 # Usage
 To rank smash players using data.csv, you can use the command:
@@ -39,7 +40,7 @@ The value in parentheses in the rankings below represents the percent of time th
 **TL;DR** If you could choose one pro to fight for you, Alpha-Rank measures how often you should pick each player. This is based on their head-to-head winrates weighted according to the strength of the opponent in each head-to-head.
 
 
-# RESULTS: 2022 Ranking (So far)
+# RESULTS: 2022 Ranking (So Far)
 Player          Rank         Score
 ------          ----         -----
 Zain            1            0.1057
