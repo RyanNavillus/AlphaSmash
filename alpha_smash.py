@@ -9,6 +9,7 @@ from preprocess import parse_csv, parse_player_names
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--alphasweep", action="store_true", help="Perform and visualize sweep over alpha parameter")
+parser.add_argument("--attendance_sweep", action="store_true", help="Perform and visualize sweep over alpha parameter")
 parser.add_argument("--n_network", type=int, default=0, help="Visualize network of top players")
 parser.add_argument("--verbose", action="store_true", help="Print out extra information")
 
@@ -50,3 +51,24 @@ if __name__ == "__main__":
                                                              rho_m, pi, player_names,
                                                              num_top_profiles=args.n_network)
         m_network_plotter.compute_and_draw_network()
+
+    if args.attendance_sweep:
+        pi_list = np.empty((num_profiles, 0))
+        bonus_list = []
+        for i in reversed(np.linspace(0, 1, 11)):
+            matrix_list = parse_csv(attendance_scalar=i, verbose=args.verbose)
+            payoff_tables = [heuristic_payoff_table.from_matrix_game(matrix_list)]
+            payoffs_are_hpt_format = utils.check_payoffs_are_hpt(payoff_tables)
+            _, payoff_tables = utils.is_symmetric_matrix_game(payoff_tables)
+            _, _, pi, num_profiles, num_strats_per_population = alpharank.compute(payoff_tables, alpha=10)
+            pi_list = np.append(pi_list, np.reshape(pi, (-1, 1)), axis=1)
+            bonus_list.append(i)
+
+        alpharank_visualizer.plot_pi_vs_alpha(pi_list.T,
+                                              bonus_list,
+                                              1,
+                                              num_strats_per_population,
+                                              player_names,
+                                              10,
+                                              plot_semilogx=True,
+                                              xlabel=r"Attendance bonus")

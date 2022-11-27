@@ -17,7 +17,7 @@ def calculate_values(wins, losses, method="linear"):
         h2h = h2h * scale
     return h2h
 
-def add_attendance_bonus(df, h2h, bonus_scale=0.1, verbose=0):
+def add_attendance_bonus(df, h2h, wins, bonus_scale=0.1, max_sets=100, verbose=0):
     """ Attendance bonus
     For any matchup without data, set the value to (s_A - s_B) / (s_A + s_B)
     where s_A and s_B are the number of sets attended by player A and B respectively.
@@ -26,9 +26,15 @@ def add_attendance_bonus(df, h2h, bonus_scale=0.1, verbose=0):
     """
     attendance = {}
     player_names = parse_player_names()
+    # Replace NaN with 0 because we'll be summing them
+    df_safe = df.fillna(0.0)
     for i, name in enumerate(player_names):
+        # Get results for player i
+        player_col = df_safe.loc[:, name].values
+        # Cap each set-count to max_sets?
+        capped_sets = np.minimum(player_col, max_sets)
         # Sum the number of wins and losses (sets played) for player name
-        attendance[i] = np.sum(df.fillna(0.0).loc[:, name].values)
+        attendance[i] = np.sum(capped_sets)
 
     # Fill in the attendance bonus for each missing set
     for i, name in enumerate(player_names):
@@ -47,33 +53,48 @@ def add_attendance_bonus(df, h2h, bonus_scale=0.1, verbose=0):
     return h2h
 
 
-def parse_csv(verbose=0):
-    df = pandas.read_csv("data.csv")
+def parse_csv(attendance_scalar=0.1, verbose=0):
+    df = pandas.read_csv("2022.csv")
 
     # Copy column names to loss columns (see csv for info)
     names = {col: df.columns[i-1] for i, col in enumerate(df.columns) if i >= 3 and i <= 124 and i % 2 == 0}
+    #names = {col: df.columns[i-1] for i, col in enumerate(df.columns) if i >= 2 and i <= 124 and i % 2 == 1}
     df.rename(columns=names, inplace=True)
 
     # Extract wins and losses
+    # 2022
     wins = df.iloc[:-1, 3:-12:2]
     losses = df.iloc[:-1, 4:-12:2]
+    # 2019
+    #wins = df.iloc[:, 3:-16:2]
+    #losses = df.iloc[:, 4:-15:2]
+    # 2020
+    #wins = df.iloc[:, 2:-16:2]
+    #losses = df.iloc[:, 3:-15:2]
 
-    h2h = calculate_values(wins, losses)
+    h2h = calculate_values(wins, losses, method="scaled")
 
     # Set self matchups to 0
     for i in range(len(h2h)):
         h2h.iloc[i,i] = 0.0
 
     # Add in attendance bonus for 0-0 (NaN) matchups
-    h2h = add_attendance_bonus(df, h2h, verbose=verbose)
+    h2h = add_attendance_bonus(df, h2h, wins, bonus_scale=attendance_scalar, verbose=verbose)
+    h2h.to_csv("2022-score.csv")
     return h2h.values
 
 
 def parse_player_names():
-    df = pandas.read_csv("data.csv")
+    df = pandas.read_csv("2022.csv")
 
     # Fix column names
     names = {col: df.columns[i-1] for i, col in enumerate(df.columns) if i >= 3 and i <= 124 and i % 2 == 0}
+    #names = {col: df.columns[i-1] for i, col in enumerate(df.columns) if i >= 2 and i <= 124 and i % 2 == 1}
     df.rename(columns=names, inplace=True)
+    # 2022
     wins = df.iloc[:-1, 3:-12:2]
+    # 2019
+    #wins = df.iloc[:, 3:-16:2]
+    # 2020
+    #wins = df.iloc[:, 2:-16:2]
     return list(wins.columns)
